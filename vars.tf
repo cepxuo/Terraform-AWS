@@ -6,6 +6,11 @@ variable "ssh_ips" {
   default     = ["0.0.0.0/0"] # Put here your IP address with /32 mask
 }
 
+variable "ssh_key" {
+  description = "Please enter SSH Key Name"
+  type        = string
+}
+
 variable "open_ports" {
   description = "List of open ports on Web Tier"
   type        = list(any)
@@ -19,6 +24,5 @@ variable "project_tags" {
     Creator = "Sergey Kirgizov"
     Env     = "DEV"
     Project = "Test Terraform with AWS"
-    #TAGKEY  = "TAGVALUE"
   }
 }

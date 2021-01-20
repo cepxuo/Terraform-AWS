@@ -184,7 +184,7 @@ resource "aws_launch_configuration" "web_fleet" {
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.ec2_group.id]
   user_data       = file("web_user_data.sh")
-  key_name        = "devops"
+  key_name        = var.ssh_key
   lifecycle {
     create_before_destroy = true
   }
@@ -195,7 +195,7 @@ resource "aws_launch_configuration" "knox" { # Fort Knox Bastion Hosts
   image_id        = data.aws_ami.amazon_linux.id
   instance_type   = "t2.micro"
   security_groups = [aws_security_group.web_group.id]
-  key_name        = "devops"
+  key_name        = var.ssh_key
   lifecycle {
     create_before_destroy = true
   }

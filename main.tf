@@ -3,6 +3,10 @@
 ##
 ## Highly Available Web Server with Blue/Green deployment and PHP 7.4 support
 ##
+## Webpage is stored in https://github.com/cepxuo/webpage.git repository
+##
+## We will create the following infrastructure:
+##
 ## - VPC
 ## - Subnets
 ## - Internet Gateway

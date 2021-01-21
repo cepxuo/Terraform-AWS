@@ -1,5 +1,10 @@
 #-------------[Output]-------------
 
+variable "region" {
+  description = "Please enter the Region"
+  default     = "eu-central-1" # Frankfurt
+}
+
 variable "ssh_ips" {
   description = "List of IPs allowed for SSH"
   type        = list(any)

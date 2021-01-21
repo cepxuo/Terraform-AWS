@@ -19,7 +19,7 @@
 #-------------[Provider AWS]-------------
 
 provider "aws" {
-  region = "eu-central-1" # Frankfurt
+  region = var.region
 }
 
 #-------------[Virtual Private Cloud]-------------

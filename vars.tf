@@ -5,6 +5,16 @@ variable "region" {
   default     = "eu-central-1" # Frankfurt
 }
 
+variable "subnets_count" {
+  description = "Please enter Subnets Cout"
+  default     = "2"
+}
+
+variable "cidr_base" {
+  description = "Please enter the CIDR base value, ended with dot"
+  default     = "10.10."
+}
+
 variable "ssh_ips" {
   description = "List of IPs allowed for SSH"
   type        = list(any)

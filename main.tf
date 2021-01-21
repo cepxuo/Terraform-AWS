@@ -29,7 +29,7 @@ provider "aws" {
 #-------------[Virtual Private Cloud]-------------
 
 resource "aws_vpc" "universe" {
-  cidr_block = "${var.cidr_base}0.0/16"
+  cidr_block = "${var.cidr_base}.0.0/16"
   tags       = merge(var.project_tags, { Name = "VPC Universe" })
 }
 
@@ -37,7 +37,7 @@ resource "aws_vpc" "universe" {
 resource "aws_subnet" "web_subnet" {
   count                   = var.subnets_count
   vpc_id                  = aws_vpc.universe.id
-  cidr_block              = "${var.cidr_base}${count.index + 10}.0/28" # /28 as we need minimal network size in Web Tier. 11 hosts available
+  cidr_block              = "${var.cidr_base}.${count.index + 10}.0/28" # /28 as we need minimal network size in Web Tier. 11 hosts available
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   map_public_ip_on_launch = true
   tags                    = merge(var.project_tags, { Name = "Web Public Subnet" })
@@ -47,7 +47,7 @@ resource "aws_subnet" "web_subnet" {
 resource "aws_subnet" "priv_subnet" {
   count                   = var.subnets_count
   vpc_id                  = aws_vpc.universe.id
-  cidr_block              = "${var.cidr_base}${count.index + 20}.0/24" # /24 will be enought for 251 hosts
+  cidr_block              = "${var.cidr_base}.${count.index + 20}.0/24" # /24 will be enought for 251 hosts
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   tags                    = merge(var.project_tags, { Name = "EC2 Private Subnet" })
   depends_on              = [aws_internet_gateway.igw] # NOT SECURE !!! Change to Nat Gateway, hence need to pay for it

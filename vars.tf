@@ -10,9 +10,14 @@ variable "subnets_count" {
   default     = "2"
 }
 
+variable "ec2_max_count" {
+  description = "Please enter maximum amount of EC2 instances in Web Fleet"
+  default     = "4"
+}
+
 variable "cidr_base" {
-  description = "Please enter the CIDR base value, ended with dot"
-  default     = "10.10."
+  description = "Please enter the CIDR base value"
+  default     = "10.10"
 }
 
 variable "ssh_ips" {

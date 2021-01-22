@@ -1,5 +1,5 @@
 
-###############################################################################
+################################################################################
 ##
 ## Highly Available Web Server with Blue/Green deployment and PHP 7.4 support
 ##
@@ -10,15 +10,16 @@
 ## - VPC
 ## - Subnets
 ## - Internet Gateway
+## - NAT Gateways with Elastic IPs
 ## - Routes
 ## - Security group
 ## - Launch Configuration
 ## - Autoscaling Group
 ## - Load Balancer
 ##
-## by Sergey Kirgizov, based on Denis Astahov's exemple
+## by Sergey Kirgizov, based on Denis Astahov's example
 ##
-###############################################################################
+################################################################################
 
 #-------------[Provider AWS]-------------
 
@@ -39,9 +40,9 @@ resource "aws_subnet" "web_subnet" {
   vpc_id                  = aws_vpc.universe.id
   cidr_block              = "${var.cidr_base}.${count.index + 10}.0/28" # /28 as we need minimal network size in Web Tier. 11 hosts available
   availability_zone       = data.aws_availability_zones.available.names[count.index]
-  map_public_ip_on_launch = true
   tags                    = merge(var.project_tags, { Name = "Web Public Subnet" })
   depends_on              = [aws_internet_gateway.igw]
+  map_public_ip_on_launch = true
 }
 
 resource "aws_subnet" "priv_subnet" {
@@ -50,16 +51,30 @@ resource "aws_subnet" "priv_subnet" {
   cidr_block              = "${var.cidr_base}.${count.index + 20}.0/24" # /24 will be enought for 251 hosts
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   tags                    = merge(var.project_tags, { Name = "EC2 Private Subnet" })
-  depends_on              = [aws_internet_gateway.igw] # NOT SECURE !!! Change to Nat Gateway, hence need to pay for it
-  map_public_ip_on_launch = true                       # NOT SECURE !!! Change to Nat Gateway, hence need to pay for it
+  map_public_ip_on_launch = false
 }
 
 #-------------[Internet Gateway]-------------
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.universe.id
+  tags   = merge(var.project_tags, { Name = "Internet Gatewey" })
+}
 
-  tags = merge(var.project_tags, { Name = "Internet Gatewey" })
+#-------------[Elastic IPs]-------------
+
+resource "aws_eip" "nat_eip" {
+  count = var.subnets_count
+  tags  = merge(var.project_tags, { Name = "Elastic IP for NAT GW" })
+}
+
+#-------------[NAT Gateways]-------------
+
+resource "aws_nat_gateway" "nat" {
+  count         = var.subnets_count
+  allocation_id = aws_eip.nat_eip[count.index].id
+  subnet_id     = aws_subnet.web_subnet[count.index].id
+  tags          = merge(var.project_tags, { Name = "NAT Gatewey" })
 }
 
 #-------------[Route Tables]-------------
@@ -67,10 +82,19 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_route_table" "web" {
   vpc_id = aws_vpc.universe.id
   tags   = merge(var.project_tags, { Name = "Route to IGW" })
-
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.igw.id
+  }
+}
+
+resource "aws_route_table" "nat" {
+  count  = var.subnets_count
+  vpc_id = aws_vpc.universe.id
+  tags   = merge(var.project_tags, { Name = "Route to NAT" })
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.nat[count.index].id
   }
 }
 
@@ -80,10 +104,10 @@ resource "aws_route_table_association" "web_az" {
   route_table_id = aws_route_table.web.id
 }
 
-resource "aws_route_table_association" "priv_az" { # NOT SECURE !!! Change to Nat Gateway, hence need to pay for it
+resource "aws_route_table_association" "priv_az" {
   count          = var.subnets_count
   subnet_id      = aws_subnet.priv_subnet[count.index].id
-  route_table_id = aws_route_table.web.id
+  route_table_id = aws_route_table.nat[count.index].id
 }
 
 #-------------[Web Security Groups]-------------
@@ -93,7 +117,6 @@ resource "aws_security_group" "web_group" {
   description = "Security Group for WEB Tier"
   tags        = merge(var.project_tags, { Name = "Web Tier SG" })
   vpc_id      = aws_vpc.universe.id
-
   dynamic "ingress" {
     for_each = var.open_ports
     content {
@@ -103,21 +126,18 @@ resource "aws_security_group" "web_group" {
       cidr_blocks = ["0.0.0.0/0"]
     }
   }
-
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "TCP"
     cidr_blocks = var.ssh_ips
   }
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 }
 
 resource "aws_security_group" "ec2_group" {
@@ -126,35 +146,30 @@ resource "aws_security_group" "ec2_group" {
   tags        = merge(var.project_tags, { Name = "EC2 Servers SG" })
   vpc_id      = aws_vpc.universe.id
   depends_on  = [aws_subnet.web_subnet]
-
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "TCP"
-    cidr_blocks = [data.aws_subnet.web_subnets.cidr_block]
+    from_port       = 80
+    to_port         = 80
+    protocol        = "TCP"
+    security_groups = [aws_security_group.web_group.id]
   }
-
   ingress {
-    from_port   = "-1"
-    to_port     = "-1"
-    protocol    = "ICMP"
-    cidr_blocks = [data.aws_subnet.web_subnets.cidr_block]
+    from_port       = "-1"
+    to_port         = "-1"
+    protocol        = "ICMP"
+    security_groups = [aws_security_group.web_group.id]
   }
-
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "TCP"
-    cidr_blocks = [data.aws_subnet.web_subnets.cidr_block]
+    from_port       = 22
+    to_port         = 22
+    protocol        = "TCP"
+    security_groups = [aws_security_group.web_group.id]
   }
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 }
 
 #-------------[Launch Configurations]-------------
@@ -191,9 +206,8 @@ resource "aws_autoscaling_group" "web_fleet_asg" {
   max_size             = var.ec2_max_count
   min_elb_capacity     = 2
   health_check_type    = "ELB"
-  vpc_zone_identifier  = [data.aws_subnet.priv_subnets.id]
+  vpc_zone_identifier  = [for s in data.aws_subnet_ids.priv_subnet_ids.ids : s]
   load_balancers       = [aws_elb.web_elb.name]
-  depends_on           = [aws_subnet.priv_subnet]
   tag {
     key                 = "Name"
     value               = "Web Server"
@@ -219,9 +233,8 @@ resource "aws_autoscaling_group" "knox_asg" { # Fort Knox Bastion Hosts ASG
   max_size             = 2
   desired_capacity     = 1
   health_check_type    = "EC2"
-  vpc_zone_identifier  = [data.aws_subnet.web_subnets.id]
+  vpc_zone_identifier  = [for s in data.aws_subnet_ids.web_subnet_ids.ids : s]
   load_balancers       = [aws_elb.web_elb.name]
-  depends_on           = [aws_subnet.web_subnet]
   tag {
     key                 = "Name"
     value               = "Fort Knox"
@@ -244,8 +257,8 @@ resource "aws_autoscaling_group" "knox_asg" { # Fort Knox Bastion Hosts ASG
 resource "aws_elb" "web_elb" {
   name            = "webserver"
   security_groups = [aws_security_group.web_group.id]
-  subnets         = [data.aws_subnet.web_subnets.id]
-  depends_on      = [aws_subnet.web_subnet]
+  subnets         = [for s in data.aws_subnet_ids.web_subnet_ids.ids : s]
+  tags            = merge(var.project_tags, { Name = "Web Server ELB" })
   listener {
     instance_port     = 80
     instance_protocol = "http"
@@ -259,5 +272,4 @@ resource "aws_elb" "web_elb" {
     target              = "HTTP:80/"
     interval            = 10
   }
-  tags = merge(var.project_tags, { Name = "Web Server ELB" })
 }

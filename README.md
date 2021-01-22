@@ -1,16 +1,16 @@
 # Terraform-AWS
-This is a set of sample Terraform scripts to deploy highly-available web server with php 7.4 support in AWS.
+This is a set of sample Terraform scripts to deploy (Blue/Green) highly-available web server with php 7.4 support in AWS.
 
 The Web Page is stored in [separate GitHub repository](https://github.com/cepxuo/webpage)
 The following repository is being cloned to each EC2 instance in Web Fleet during bootstrap.
 
-**NOTE:** The scripts will create NAT Gateways in *each Public Subnet*, which are not part of AWS Free-Tier and you need to pay for them on hourly basis. If you plan to stay with AWS Free-Tier you can checkout to `free-tier` branch. However in such case Web Tier will be in Public zone, which is less secure.
+**NOTE:** This branch is eligible with AWS Free-Tier and you do not need to pay extra charges for NAT Gateways. However in such case Web Tier will be in Public zone, which is less secure.
 
 The following diagram describes the infrastructure created by the scripts.
 
-![Infrastructure](https://github.com/cepxuo/Terraform-AWS/blob/master/images/Terraform-AWS.png?raw=true)
+![Infrastructure](https://github.com/cepxuo/Terraform-AWS/blob/free-tier/images/Terraform-AWS-Free.png?raw=true)
 
-The red arrows show traffic from/to Internet. The green arrows show traffic within VPC.
+The red arrows show traffic from/to Internet.
 
 You can adjust the following parameters, stored in `vars.tf` file:
 

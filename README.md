@@ -25,4 +25,4 @@ You can adjust the following parameters, stored in `vars.tf` file:
 | `open_ports` | Ports opened for Web Application |
 | `project_tags` | Map of common project tags |
 
-Big thanks to **Denis Astahov** for his Udemy courses and educational [YouTube channel](https://www.youtube.com/channel/UC-sAMvDe7gTmBbub-rWljZg)
+Big thanks to [**Denis Astahov**](https://github.com/adv4000) for his Udemy courses and educational [YouTube channel](https://www.youtube.com/channel/UC-sAMvDe7gTmBbub-rWljZg)

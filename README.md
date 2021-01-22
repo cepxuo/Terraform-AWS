@@ -1,7 +1,7 @@
 # Terraform-AWS
 This is a set of sample Terraform scripts to deploy highly-available web server with php 7.4 support in AWS.
 
-The Web Page is stored in separate GitHub repository: https://github.com/cepxuo/webpage
+The Web Page is stored in [separate GitHub repository](https://github.com/cepxuo/webpage)
 The following repository is being cloned to each EC2 instance in Web Fleet during bootstrap.
 
 **NOTE:** The scripts will create NAT Gateways in *each* subnet, which are not part of AWS Free-Tier and you need to pay for them on hourly basis. If you plan to stay with AWS Free-Tier you can checkout to `free-tier` branch. However in such case Web Tier will be in Public zone, which is less secure.
@@ -25,4 +25,4 @@ You can adjust the following parameters, stored in `vars.tf` file:
 | `open_ports` | Ports opened for Web Application |
 | `project_tags` | Map of common project tags |
 
-Big thanks to Denis Astahov for his Udemy courses and educational YouTube channel: https://www.youtube.com/channel/UC-sAMvDe7gTmBbub-rWljZg
+Big thanks to **Denis Astahov** for his Udemy courses and educational [YouTube channel](https://www.youtube.com/channel/UC-sAMvDe7gTmBbub-rWljZg)

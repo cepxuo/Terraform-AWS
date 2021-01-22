@@ -12,7 +12,7 @@ The following diagram describes the infrastructure created by the scripts.
 
 The red arrows show traffic from/to Internet. The green arrows show traffic within VPC.
 
-You can adjust the following parameters, stores in vars.tf file:
+You can adjust the following parameters, stored in `vars.tf` file:
 
 | Variable | Description |
 | --- | --- |
@@ -25,4 +25,4 @@ You can adjust the following parameters, stores in vars.tf file:
 | `open_ports` | Ports opened for Web Application |
 | `project_tags` | Map of common project tags |
 
-Big thanks to Denis Astahov for his educational YouTube channel: https://www.youtube.com/channel/UC-sAMvDe7gTmBbub-rWljZg
+Big thanks to Denis Astahov for his Udemy courses and educational YouTube channel: https://www.youtube.com/channel/UC-sAMvDe7gTmBbub-rWljZg

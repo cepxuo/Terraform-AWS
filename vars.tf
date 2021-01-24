@@ -1,5 +1,11 @@
 #-------------[Output]-------------
 
+variable "free_tier" {
+  description = "Please define true if you wish to stay within free-tier. Note, that Web Layer will be in Public zone!"
+  type        = bool
+  default     = true
+}
+
 variable "region" {
   description = "Please enter the Region"
   default     = "eu-central-1" # Frankfurt

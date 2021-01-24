@@ -62,7 +62,7 @@ resource "aws_subnet" "priv_subnet" {
   cidr_block              = "${var.cidr_base}.${count.index + 20}.0/24" # /24 will be enought for 251 hosts
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   tags                    = merge(local.tags, { Name = "EC2 Private Subnet" })
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = (var.free_tier == true ? true : false)
 }
 
 #-------------[Internet Gateway]-------------
@@ -75,14 +75,14 @@ resource "aws_internet_gateway" "igw" {
 #-------------[Elastic IPs]-------------
 
 resource "aws_eip" "nat_eip" {
-  count = var.subnets_count
+  count = (var.free_tier == true ? 0 : var.subnets_count)
   tags  = merge(local.tags, { Name = "Elastic IP for NAT GW" })
 }
 
 #-------------[NAT Gateways]-------------
 
 resource "aws_nat_gateway" "nat" {
-  count         = var.subnets_count
+  count         = (var.free_tier == true ? 0 : var.subnets_count)
   allocation_id = aws_eip.nat_eip[count.index].id
   subnet_id     = aws_subnet.web_subnet[count.index].id
   tags          = merge(local.tags, { Name = "NAT Gatewey" })
@@ -105,7 +105,7 @@ resource "aws_route_table" "nat" {
   tags   = merge(local.tags, { Name = "Route to NAT" })
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.nat[count.index].id
+    gateway_id = (var.free_tier == true ? aws_internet_gateway.igw.id : aws_nat_gateway.nat[count.index].id)
   }
 }
 

@@ -3,7 +3,7 @@
 variable "free_tier" {
   description = "Please define true if you wish to stay within free-tier. Note, that Web Layer will be in Public zone!"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "region" {

@@ -4,7 +4,7 @@ This is a set of sample Terraform scripts to deploy (Blue/Green) highly-availabl
 The Web Page is stored in [separate GitHub repository](https://github.com/cepxuo/webpage)
 The following repository is being cloned to each EC2 instance in Web Fleet during bootstrap.
 
-**NOTE:** The scripts will create NAT Gateways in *each Public Subnet*, which are not part of AWS Free-Tier and you need to pay for them on hourly basis. If you plan to stay within AWS Free-Tier you can set `free-tier` variable to `false`. However in such case Web Tier will be in Public zone, which is less secure.
+**NOTE:** The scripts will create NAT Gateways in *each Public Subnet*, which are not part of AWS Free-Tier and you need to pay for them on hourly basis. If you plan to stay within AWS Free-Tier you can set `free-tier` variable to `true`. However in such case Web Tier will be in Public zone, which is less secure.
 
 The following diagram describes the infrastructure created by the scripts.
 

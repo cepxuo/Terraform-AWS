@@ -37,12 +37,23 @@ variable "open_ports" {
   default     = ["80", "443"]
 }
 
+variable "creator" {
+  description = "Please enter project creator's name"
+  default     = "Sergey Kirgizov"
+}
+
+variable "environment" {
+  description = "Please enter project environment"
+  default     = "dev"
+}
+
+variable "project" {
+  description = "Please enter project name"
+  default     = "terraform-aws"
+}
+
 variable "project_tags" {
   description = "Common Tags"
   type        = map(any)
-  default = {
-    Creator = "Sergey Kirgizov"
-    Env     = "DEV"
-    Project = "Test Terraform with AWS"
-  }
+  default     = {}
 }

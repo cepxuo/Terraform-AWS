@@ -1,4 +1,4 @@
-#-------------[Output]-------------
+#-------------[Variables]-------------
 
 variable "free_tier" {
   description = "Please define true if you wish to stay within free-tier. Note, that Web Layer will be in Public zone!"
@@ -7,23 +7,27 @@ variable "free_tier" {
 }
 
 variable "region" {
-  description = "Please enter the Region"
+  description = "AWS Region"
   default     = "eu-central-1" # Frankfurt
+  type        = string
 }
 
 variable "subnets_count" {
-  description = "Please enter Subnets Cout"
+  description = "Subnets Cout"
   default     = "2"
+  type        = string
 }
 
 variable "ec2_max_count" {
-  description = "Please enter maximum amount of EC2 instances in Web Fleet"
+  description = "Maximum amount of EC2 instances in Web Fleet"
   default     = "4"
+  type        = string
 }
 
 variable "cidr_base" {
-  description = "Please enter the CIDR base value"
+  description = "CIDR base value"
   default     = "10.10"
+  type        = string
 }
 
 variable "ssh_ips" {
@@ -33,7 +37,7 @@ variable "ssh_ips" {
 }
 
 variable "ssh_key" {
-  description = "Please enter SSH Key Name"
+  description = "SSH Key Name"
   type        = string
 }
 
@@ -44,18 +48,21 @@ variable "open_ports" {
 }
 
 variable "creator" {
-  description = "Please enter project creator's name"
+  description = "Project creator's name"
   default     = "Sergey Kirgizov"
+  type        = string
 }
 
-variable "environment" {
-  description = "Please enter project environment"
+variable "env" {
+  description = "Project environment"
   default     = "dev"
+  type        = string
 }
 
 variable "project" {
-  description = "Please enter project name"
+  description = "Project name"
   default     = "terraform-aws"
+  type        = string
 }
 
 variable "project_tags" {
